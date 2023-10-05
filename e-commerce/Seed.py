@@ -1,4 +1,4 @@
-from pydantic import BaseModel, FilePath, Field, EmailStr
+from pydantic import BaseModel, FilePath, Field, EmailStr, field_validator
 from pymongo import MongoClient
 from pprint import pprint
 from datetime import datetime
@@ -32,6 +32,14 @@ class Producto(BaseModel):
     image: str | None
     rating: Nota
 
+    # Validar que el nombre comience con mayúscula
+    @field_validator('title')
+    @classmethod
+    def validate_nombre(cls, value):
+        if not value[0].isupper():
+            raise ValueError("El nombre debe comenzar con una letra mayúscula")
+        return value
+
 
 class Compra(BaseModel):
     _id: Any
@@ -48,7 +56,14 @@ def connect_db():
     return productos_collection, compras_collection
 
 
+def drop_db():
+    productos_collection, compras_collection = connect_db()
+    productos_collection.drop()
+    compras_collection.drop()
+
+
 def main():
+    drop_db()
     productos_collection, compras_collection = connect_db()
 
     productos = getProductos('https://fakestoreapi.com/products')
@@ -65,10 +80,25 @@ def main():
 
             p['image'] = os.path.basename(p['image'])
         else:
-            p['image'] = False
+            p['image'] = None
 
         producto = Producto(**p)
         productos_collection.insert_one(producto.model_dump())
+
+    # Comprobar field validator
+    # dato_erroneo = {
+    #     'title': "mBJ Women's Solid Short Sleeve Boat Neck V ",
+    #     'price': 9.85,
+    #     'description': '95% RAYON 5% SPANDEX, Made in USA or Imported, \
+    #                     Do Not Bleach, Lightweight fabric with great \
+    #                     stretch for comfort, Ribbed on sleeves and \
+    #                     neckline / Double stitching on bottom hem',
+    #     'category': "women's clothing",
+    #     'image': None,
+    #     'rating': {'rate': 4.7, 'count': 130}
+    # }
+
+    # dato_erroneo = Producto(**dato_erroneo)
 
 
 if __name__ == "__main__":
