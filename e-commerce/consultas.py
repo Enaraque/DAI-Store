@@ -54,6 +54,10 @@ for r in resultado:
 print("\n------------------------------------------------------------------")
 print("[blue]6- Facturación por categoría de producto[/blue]\n")
 resultado = productos_collection.aggregate([{"$group": {"_id": "$category",
-                                            "total": {"$sum": "$price"}}}])
+                                                        "total": {"$sum": "$price"}},
+                                             }])
+
 for r in resultado:
-    print(f"Facturación {r['_id']}: {r['total']}")
+    print(r)
+
+    #print(f"Facturación {r['_id']}: {r['total']}")
