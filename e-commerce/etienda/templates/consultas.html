@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h1>Listado de Consultas</h1>
+
+<h2>1- Electrónica entre 100 y 200€, ordenados por precio</h2>
+<ul> 
+    {% for p in consulta1 %}
+        <li> {{ p.title }} -> {{p.price}} </li>
+    {% endfor %}
+</ul>
+
+<h2>2- Productos que contengan la palabra 'pocket' en la descripción</h2>
+<ul> 
+    {% for p in consulta2 %}
+        <li> {{ p.title }} -> {{p.description}} </li>
+    {% endfor %}
+</ul>
+
+<h2>3- Productos con rating mayor que 4</h2>
+<ul> 
+    {% for p in consulta3 %}
+        <li> {{ p.title }} -> {{p.rating.rate}} </li>
+    {% endfor %}
+</ul>
+
+<h2>4- Ropa de hombre, ordenada por puntuación</h2>
+<ul> 
+    {% for p in consulta4 %}
+        <li> {{ p.title }} -> {{p.rating.rate}} </li>
+    {% endfor %}
+</ul>
+
+<h2>5- Facturación total</h2>
+<ul> 
+    {% for p in consulta5 %}
+        <li> Facturación total -> {{p.total_facturacion}} </li>
+    {% endfor %}
+</ul>
+
+<h2>6- Facturación por categoría de producto</h2>
+<ul> 
+    {% for p in consulta6 %}
+        <li> {{ p.categoria }} -> {{p.total_facturacion}} </li>
+    {% endfor %}
+</ul>
+
+</body>
+</html>
