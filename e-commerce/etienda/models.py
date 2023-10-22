@@ -65,8 +65,13 @@ class Producto(BaseModel):
         return collection.find(query).sort(orden)
 
     @staticmethod
+    def get_all_categories(collection):
+        query = {"category": {"$exists": True}}
+        return collection.find(query).distinct("category")
+
+    @staticmethod
     def get_product_type(collection, type: str):
-        query = {"description": {"$regex": "pocket"}}
+        query = {"description": {"$regex": type, "$options": "i"}}
 
         return collection.find(query)
 
