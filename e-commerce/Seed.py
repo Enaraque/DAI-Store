@@ -70,11 +70,11 @@ def main():
     for p in productos:
         respuesta = requests.get(p['image'])
         if respuesta.status_code == 200:
-            dir_img = "img"
+            dir_img = "static/img"
             if not os.path.exists(dir_img):
                 os.makedirs(dir_img)
 
-            nombre_archivo = os.path.join('img', os.path.basename(p['image']))
+            nombre_archivo = os.path.join(dir_img, os.path.basename(p['image']))
             with open(nombre_archivo, 'wb') as archivo:
                 archivo.write(respuesta.content)
 
