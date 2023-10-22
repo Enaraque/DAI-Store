@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML principal</title>
+    
+    <!-- Enlaza el archivo CSS de Bootstrap -->
+    {% load static %}
+    <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/default.css' %}" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light">
+            <a class="navbar-brand" href="{% url 'index' %}">Store</a>
+          
+            <div class="collapse navbar-collapse d-flex justify-content-end" id="navbarSupportedContent">
+              <ul class="navbar-nav mr-auto">
+                <form action="{% url 'filtro' %}" method="get">
+                    <div class="form-group d-flex">
+                        <input class="form-control mr-2" name="search" id="search-input" type="search" placeholder="Search" aria-label="Search">
+                        <button class="btn bg-sucess" id="search-button" type="submit">Search</button>
+                    </div>
+                </form>
+                <li class="nav-item dropdown">
+                    <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Categories
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        {% for category in categorias %}
+                            <a class="dropdown-item" href="{% url 'categorias' category %}">{{ category }}</a>
+                        {% endfor %}
+                    </div>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">Orders</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">Logout</a>
+                </li>
+              </ul>
+            </div>
+        </nav>
+    </header>
+    
+    {% block main %}
+
+    {% endblock %}
+    
+    <!-- Enlaza los archivos JS de Bootstrap -->
+    {% load static %}
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
