@@ -23,6 +23,7 @@ form > div > button.btn:focus {
 .my-gallery {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
 }
 .my-card {
     margin-top: 30px;

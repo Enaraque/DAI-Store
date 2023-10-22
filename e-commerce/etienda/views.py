@@ -8,11 +8,10 @@ def index(request):
     tienda_db, client = Database_connection().get_connection()
     productos_collection = Database_connection().get_collection("productos")
 
-    consultas = get_consultas(productos_collection)
     categoriasEncabezado = get_categorias_encabezado(productos_collection)
-    context = {**consultas, **categoriasEncabezado}
+    context = {**categoriasEncabezado}
 
-    return render(request, "consultas.html", context)
+    return render(request, "landing_page.html", context)
 
 
 def get_consultas(collection):
