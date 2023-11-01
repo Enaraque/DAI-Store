@@ -15,43 +15,63 @@
         <nav class="navbar navbar-expand-lg navbar-light">
             <a class="navbar-brand" href="{% url 'index' %}">Store</a>
           
-            <div class="collapse navbar-collapse d-flex justify-content-end" id="navbarSupportedContent">
-              <ul class="navbar-nav mr-auto">
-                <form action="{% url 'filtro' %}" method="get">
-                    <div class="form-group d-flex">
-                        <input class="form-control mr-2" name="search" id="search-input" type="search" placeholder="Search" aria-label="Search">
-                        <button class="btn bg-sucess" id="search-button" type="submit">Search</button>
-                    </div>
-                </form>
-                <li class="nav-item dropdown">
-                    <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Categories
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        {% for category in categorias %}
-                            <a class="dropdown-item" href="{% url 'categorias' category %}">{{ category }}</a>
-                        {% endfor %}
-                    </div>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="#">Orders</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="#">Logout</a>
-                </li>
-              </ul>
+            <div class="collapse navbar-collapse d-flex" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item dropdown">
+                        <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Categories
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            {% for category in categorias %}
+                                <a class="dropdown-item" href="{% url 'categorias' category.nombre %}">{{ category.nombre }}</a>
+                            {% endfor %}
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'nuevo_producto' %}">Nuevo producto</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Orders</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Logout</a>
+                    </li>
+                </ul>
             </div>
+            <form action="{% url 'filtro' %}" method="get">
+                <div class="form-group d-flex">
+                    <input class="form-control mr-2" name="search" id="search-input" type="search" placeholder="Search" aria-label="Search">
+                    <button class="btn bg-sucess" id="search-button" type="submit">Search</button>
+                </div>
+            </form> 
         </nav>
     </header>
     
-    {% block main %}
+    <main>
+        {% include 'messages.html' %}
+        {% block main %}
 
-    {% endblock %}
+        {% endblock %}
+    </main>
+    
     
     <!-- Enlaza los archivos JS de Bootstrap -->
     {% load static %}
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            setTimeout(function() {
+                $('.messages').show(); // Mostrar el elemento con jQuery
+            }, 500);
+
+            setTimeout(function() {
+                $('.messages').remove(); // Eliminar el elemento con jQuery
+            }, 5000);
+        });
+
+    </script>
 </body>
 </html>

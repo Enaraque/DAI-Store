@@ -3,22 +3,13 @@
 {% block main %}
 
 <div class="my-gallery">
-    {% for c in  categorias %}
+    {% for c in categorias %}
         <div class="card my-card" >
             {% load static %}
-            {% if c == "electronics" %}
-            <img src="{% static 'etienda/img/electronics.jpg' %}" alt="{{ c.title }}">
-            {% elif c == "women's clothing" %}
-            <img src="{% static 'etienda/img/women.jpg' %}" alt="{{ c.title }}">
-            {% elif c == "men's clothing" %}
-            <img src="{% static 'etienda/img/men.jpg' %}" alt="{{ c.title }}">
-            {% elif c == "jewelery" %}
-            <img src="{% static 'etienda/img/jewelery.jpg' %}" alt="{{ c.title }}">
-            {% endif %}
+            <img src="{% static 'img/'|add:c.imagen %}" alt="{{ c.nombre }}">
             <div class="card-body my-card-body">
-                <h5 class="card-title">{{ c }}</h5>
-                <p class="card-text">{{ p.description }}</p>
-                <form action="{% url 'categorias' c %}">
+                <h5 class="card-title">{{ c.nombre }}</h5>
+                <form action="{% url 'categorias' c.nombre %}">
                     <div class="d-flex">
                         <button class="btn" id="search-button" type="submit">View Items</button>
                     </div>
