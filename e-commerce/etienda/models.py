@@ -65,6 +65,11 @@ class Producto(BaseModel):
         return collection.find(query).sort(orden)
 
     @staticmethod
+    def get_imagen_producto(collection, id: str):
+        query = {"_id": id}
+        return collection.find_one(query, {"_id": 0, "image": 1})
+
+    @staticmethod
     def get_all_categories(collection):
         query = {"category": {"$exists": True}}
         return collection.find(query).distinct("category")
@@ -99,6 +104,11 @@ class Producto(BaseModel):
                                           ]
                                          )
         return resultado
+
+    @staticmethod
+    def add_producto(collection, producto):
+        producto = Producto(**producto)
+        collection.insert_one(producto.model_dump())
 
 
 class Compra(BaseModel):
