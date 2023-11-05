@@ -96,3 +96,9 @@ form > div > button.btn:focus {
     text-align: center;
     font-weight: bold;
 }
+
+.form-errors {
+    color: red;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
