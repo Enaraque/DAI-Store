@@ -9,25 +9,17 @@ sys.path.append("..")  # Adds higher directory to python modules path.
 
 
 class Database_connection:
-    _instance = None
+    db, client = get_db_handle('tienda', host='mongo',
+                               port=27017
+                               )
 
-    def __new__(cls, *args, **kwargs):
-        if cls._instance is None:
-            cls._instance = super(Database_connection, cls).__new__(cls, *args,
-                                                                    **kwargs)
-        return cls._instance
+    @classmethod
+    def get_connection(cls):
+        return cls.db, cls.client
 
-    def __init__(self):
-        if not hasattr(self, 'client'):
-            self.db, self.client = get_db_handle('tienda', host='mongo',
-                                                 port=27017
-                                                 )
-
-    def get_connection(self):
-        return self.db, self.client
-
-    def get_collection(self, collection_name):
-        return self.db[collection_name]
+    @classmethod
+    def get_collection(cls, collection_name):
+        return cls.db[collection_name]
 
 
 class Nota(BaseModel):
