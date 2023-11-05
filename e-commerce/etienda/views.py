@@ -1,17 +1,20 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import loader
-from .models import Database_connection, Producto
+from .models import Database_connection as DB, Producto
 from .forms import ProductoForm
 from django.contrib import messages
 import logging
+from PIL import Image
+from datetime import datetime as dt
+import os
 
 logger = logging.getLogger(__name__)
 
 
 def index(request):
-    tienda_db, client = Database_connection().get_connection()
-    productos_collection = Database_connection().get_collection("productos")
+    tienda_db, client = DB.get_connection()
+    productos_collection = DB.get_collection("productos")
 
     categorias = get_categorias_encabezado(productos_collection)
     context = {**categorias}
@@ -48,7 +51,6 @@ def get_consultas(colection):
 def get_categorias_encabezado(coleccion):
     categoriasEncabezado = Producto.get_all_categories(coleccion)
     imagenes = get_imagen_categoria(coleccion, categoriasEncabezado)
-    print(categoriasEncabezado)
 
     categorias = []
     for i in range(len(categoriasEncabezado)):
@@ -59,7 +61,7 @@ def get_categorias_encabezado(coleccion):
         categorias.append(categoria_con_imagen)
 
     context = {"categorias": categorias}
-    print(context)
+
     return context
 
 
@@ -74,8 +76,8 @@ def get_imagen_categoria(coleccion, categorias):
 
 
 def get_categoria(request, categoria):
-    tienda_db, client = Database_connection().get_connection()
-    productos_collection = Database_connection().get_collection("productos")
+    tienda_db, client = DB.get_connection()
+    productos_collection = DB.get_collection("productos")
 
     productos = Producto.get_producto(productos_collection, categoria)
     encabezado = get_categorias_encabezado(productos_collection)
@@ -85,8 +87,8 @@ def get_categoria(request, categoria):
 
 
 def filtrar_busqueda(request):
-    tienda_db, client = Database_connection().get_connection()
-    productos_collection = Database_connection().get_collection("productos")
+    tienda_db, client = DB.get_connection()
+    productos_collection = DB.get_collection("productos")
     filtrado = request.GET.get('search')
 
     productos = Producto.get_product_type(productos_collection, filtrado)
@@ -97,8 +99,8 @@ def filtrar_busqueda(request):
 
 
 def nuevo_producto(request):
-    tienda_db, client = Database_connection().get_connection()
-    productos_collection = Database_connection().get_collection("productos")
+    tienda_db, client = DB.get_connection()
+    productos_collection = DB.get_collection("productos")
     form = ProductoForm()
     encabezado = get_categorias_encabezado(productos_collection)
     context = {**encabezado, "form": form}
@@ -107,8 +109,8 @@ def nuevo_producto(request):
 
 
 def insertar_nuevo_producto(request):
-    tienda_db, client = Database_connection().get_connection()
-    productos_collection = Database_connection().get_collection("productos")
+    tienda_db, client = DB.get_connection()
+    productos_collection = DB.get_collection("productos")
 
     encabezado = get_categorias_encabezado(productos_collection)
     context = {**encabezado}
@@ -116,12 +118,22 @@ def insertar_nuevo_producto(request):
     if request.method == 'POST':
         form = ProductoForm(request.POST, request.FILES)
         if form.is_valid():
-            nombre = form.cleaned_data['nombre'].capitalize()
+            nombre = form.cleaned_data['nombre']
             precio = form.cleaned_data['precio']
             descripcion = form.cleaned_data['descripcion'].capitalize()
             categoria = form.cleaned_data['categoria']
-            # imagen = request.FILES['imagen']
-            imagen = None
+            if 'imagen' in request.FILES:
+                imagen = request.FILES['imagen']
+                name, extension = os.path.splitext(imagen.name)
+                imagen.name = name + "-" + dt.utcnow().strftime("%Y%m%d%H%M%S") + extension
+                print(imagen.name)
+
+                with Image.open(imagen) as img:
+                    img.save(f"static/img/{imagen.name}")
+            else:
+                imagen = None
+
+            print(type(imagen))
             rating = {"rate": 0.0,
                       "count": 1
                       }
@@ -129,19 +141,19 @@ def insertar_nuevo_producto(request):
                      "price": precio,
                      "description": descripcion,
                      "category": categoria,
-                     "image": imagen,
+                     "image": str(imagen),
                      "rating": rating,
                      }
             Producto.add_producto(productos_collection, datos)
 
+            productos_collection = DB.get_collection("productos")
+            encabezado = get_categorias_encabezado(productos_collection)
+            context = {**encabezado}
+
             messages.success(request, 'Producto agregado correctamente')
-        else:
-            messages.error(request, "Error al agregar el producto")
-    else:
-        messages.error(request, "Método no válido")
 
-    productos_collection = Database_connection().get_collection("productos")
-    encabezado = get_categorias_encabezado(productos_collection)
-    context = {**encabezado}
+            return render(request, "landing_page.html", context)
 
-    return render(request, "landing_page.html", context)
+        context = {**encabezado, "form": form}
+
+    return render(request, "nuevo_producto.html", context)
