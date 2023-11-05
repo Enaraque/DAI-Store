@@ -5,13 +5,12 @@ from typing import Any
 from datetime import datetime
 from utils import get_db_handle
 from pymongo import MongoClient
+
 sys.path.append("..")  # Adds higher directory to python modules path.
 
 
 class Database_connection:
-    db, client = get_db_handle('tienda', host='mongo',
-                               port=27017
-                               )
+    db, client = get_db_handle("tienda", host="mongo", port=27017)
 
     @classmethod
     def get_connection(cls):
@@ -23,7 +22,7 @@ class Database_connection:
 
 
 class Nota(BaseModel):
-    rate: float = Field(ge=0., lt=5.)
+    rate: float = Field(ge=0.0, lt=5.0)
     count: int = Field(ge=1)
 
 
@@ -37,7 +36,7 @@ class Producto(BaseModel):
     rating: Nota
 
     # Validar que el nombre comience con mayúscula
-    @field_validator('title')
+    @field_validator("title")
     @classmethod
     def validate_nombre(cls, value):
         if not value[0].isupper():
@@ -45,13 +44,10 @@ class Producto(BaseModel):
         return value
 
     @staticmethod
-    def get_producto(collection, category: str,
-                     min_price=0.0, max_price=float('inf'), orden="price"):
-        query = {"category": category,
-                 "price": {"$gte": min_price,
-                           "$lte": max_price
-                           }
-                 }
+    def get_producto(
+        collection, category: str, min_price=0.0, max_price=float("inf"), orden="price"
+    ):
+        query = {"category": category, "price": {"$gte": min_price, "$lte": max_price}}
         orden = [(orden, -1)]
 
         return collection.find(query).sort(orden)
@@ -73,28 +69,24 @@ class Producto(BaseModel):
         return collection.find(query)
 
     @staticmethod
-    def get_product_by_rate(collection, min_rate=0.0, max_rate=float('inf')):
-        query = {"rating.rate": {"$gt": min_rate,
-                                 "$lt": max_rate
-                                 }
-                 }
+    def get_product_by_rate(collection, min_rate=0.0, max_rate=float("inf")):
+        query = {"rating.rate": {"$gt": min_rate, "$lt": max_rate}}
 
         return collection.find(query)
 
     @staticmethod
     def get_facturacion(collection, identificador=None):
-        resultado = collection.aggregate([{"$group": {
-                                                "_id": f"${identificador}",
-                                                "total": {"$sum": "$price"}
-                                                }
-                                           },
-                                          {"$project": {
-                                                "categoria": "$_id",
-                                                "total_facturacion": "$total",
-                                                }
-                                           }
-                                          ]
-                                         )
+        resultado = collection.aggregate(
+            [
+                {"$group": {"_id": f"${identificador}", "total": {"$sum": "$price"}}},
+                {
+                    "$project": {
+                        "categoria": "$_id",
+                        "total_facturacion": "$total",
+                    }
+                },
+            ]
+        )
         return resultado
 
     @staticmethod
