@@ -12,6 +12,7 @@ def getProductos(api):
     response = requests.get(api)
     return response.json()
 
+
 # Esquema de la BD
 # https://docs.pydantic.dev/latest/
 # con anotaciones de tipo https://docs.python.org/3/library/typing.html
@@ -19,7 +20,7 @@ def getProductos(api):
 
 
 class Nota(BaseModel):
-    rate: float = Field(ge=0., lt=5.)
+    rate: float = Field(ge=0.0, lt=5.0)
     count: int = Field(ge=1)
 
 
@@ -33,7 +34,7 @@ class Producto(BaseModel):
     rating: Nota
 
     # Validar que el nombre comience con mayúscula
-    @field_validator('title')
+    @field_validator("title")
     @classmethod
     def validate_nombre(cls, value):
         if not value[0].isupper():
@@ -49,7 +50,7 @@ class Compra(BaseModel):
 
 
 def connect_db():
-    client = MongoClient('mongo', 27017)
+    client = MongoClient("mongo", 27017)
     tienda_db = client.tienda
     productos_collection = tienda_db.productos
     compras_collection = tienda_db.compras
@@ -66,21 +67,21 @@ def main():
     drop_db()
     productos_collection, compras_collection = connect_db()
 
-    productos = getProductos('https://fakestoreapi.com/products')
+    productos = getProductos("https://fakestoreapi.com/products")
     for p in productos:
-        respuesta = requests.get(p['image'])
+        respuesta = requests.get(p["image"])
         if respuesta.status_code == 200:
-            dir_img = "img"
+            dir_img = "static/img"
             if not os.path.exists(dir_img):
                 os.makedirs(dir_img)
 
-            nombre_archivo = os.path.join('img', os.path.basename(p['image']))
-            with open(nombre_archivo, 'wb') as archivo:
+            nombre_archivo = os.path.join(dir_img, os.path.basename(p["image"]))
+            with open(nombre_archivo, "wb") as archivo:
                 archivo.write(respuesta.content)
 
-            p['image'] = os.path.basename(p['image'])
+            p["image"] = os.path.basename(p["image"])
         else:
-            p['image'] = None
+            p["image"] = None
 
         producto = Producto(**p)
         productos_collection.insert_one(producto.model_dump())

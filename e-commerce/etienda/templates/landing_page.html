@@ -1,0 +1,23 @@
+{% extends 'index.html' %}
+
+{% block main %}
+
+<div class="my-gallery">
+    {% for c in categorias %}
+        <div class="card my-card" >
+            {% load static %}
+            <img src="{% static 'img/'|add:c.imagen %}" alt="{{ c.nombre }}">
+            <div class="card-body my-card-body">
+                <h5 class="card-title">{{ c.nombre }}</h5>
+                <form action="{% url 'categorias' c.nombre %}">
+                    <div class="d-flex">
+                        <button class="btn" id="search-button" type="submit">View Items</button>
+                    </div>
+                    
+                </form>
+            </div>
+        </div> 
+    {% endfor %}  
+</div>
+
+{% endblock %}

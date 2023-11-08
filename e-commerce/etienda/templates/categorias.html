@@ -1,0 +1,20 @@
+{% extends 'index.html' %}
+
+{% block main %}
+
+<div class="my-gallery">
+{% for p in productos %}
+    <div class="card my-card" >
+        {% load static %}
+        <img src="{% static 'img/'|add:p.image %}" alt="{{ p.title }}">
+        <div class="card-body my-card-body">
+            <h5 class="card-title">{{ p.title }}</h5>
+            <p class="card-text">{{ p.description }}</p>
+            <p class="price">{{ p.price }}</p>
+        </div>
+      </div>
+
+{% endfor %}  
+</div>
+
+{% endblock %}

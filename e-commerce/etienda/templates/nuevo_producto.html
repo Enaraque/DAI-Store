@@ -1,0 +1,23 @@
+{% extends 'index.html' %}
+{% block main %}
+
+
+<form action="{% url 'insertar_nuevo_producto' %}" method="post" class="add-elemento" enctype="multipart/form-data">
+	{% csrf_token %}
+    {% for campo in form %}
+        <div class="form-group">
+            {{ campo.label_tag }}
+            {{ campo }}
+            {% if campo.errors %}
+                <ul class="form-errors">
+                    {% for error in campo.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+    {% endfor %}
+	<button type="submit" class="btn">Añadir</button>
+</form>
+
+{% endblock %}

@@ -3,10 +3,10 @@ from rich import print
 import os
 
 # Configuración de la conexión MongoDB
-host = 'mongo'
+host = "mongo"
 port = 27017
-database_name = 'tienda'
-backup_dir = './backup'
+database_name = "tienda"
+backup_dir = "./backup"
 
 
 # Función para obtener la fecha de modificación de un archivo
@@ -16,8 +16,11 @@ def obtener_fecha_modificacion(dir):
 
 # Funcion para obtener el backup mas reciente
 def backup_reciente():
-    num_buckups = [dir for dir in os.listdir(backup_dir)
-                   if os.path.isdir(os.path.join(backup_dir, dir))]
+    num_buckups = [
+        dir
+        for dir in os.listdir(backup_dir)
+        if os.path.isdir(os.path.join(backup_dir, dir))
+    ]
 
     max_backup = max(num_buckups, key=obtener_fecha_modificacion)
     database_name = os.listdir(f"{backup_dir}/{max_backup}")[0]
@@ -31,11 +34,14 @@ def restore_backup():
 
     # Comando mongorestore a ejecutar
     mongorestore_cmd = [
-        'mongorestore',
-        '--host', host,
-        '--port', str(port),
-        '--db', database_name,
-        f"{backup_dir}/{backup}"
+        "mongorestore",
+        "--host",
+        host,
+        "--port",
+        str(port),
+        "--db",
+        database_name,
+        f"{backup_dir}/{backup}",
     ]
 
     # Ejecuta el comando de mongorestore
