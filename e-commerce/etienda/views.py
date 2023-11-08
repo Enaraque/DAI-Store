@@ -2,12 +2,14 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import loader
 from .models import Database_connection as DB, Producto
-from .forms import ProductoForm
+from .forms import ProductoForm, LogginForm
 from django.contrib import messages
 import logging
 from PIL import Image
 from datetime import datetime as dt
 import os
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login, logout
 
 logger = logging.getLogger(__name__)
 
@@ -150,3 +152,51 @@ def insertar_nuevo_producto(request):
         context = {**encabezado, "form": form}
 
     return render(request, "nuevo_producto.html", context)
+
+
+def get_login(request):
+    tienda_db, client = DB.get_connection()
+    productos_collection = DB.get_collection("productos")
+
+    encabezado = get_categorias_encabezado(productos_collection)
+    form = LogginForm()
+    context = {**encabezado, "form": form}
+
+    return render(request, "registration/login.html", context)
+
+
+def validar_login(request):
+    tienda_db, client = DB.get_connection()
+    productos_collection = DB.get_collection("productos")
+
+    encabezado = get_categorias_encabezado(productos_collection)
+    form = LogginForm()
+    context = {**encabezado, "form": form}
+
+    if request.method == "POST":
+        form = LogginForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data["username"]
+            password = form.cleaned_data["password"]
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return render(request, "landing_page.html", context)
+
+            else:
+                messages.error(request, "Usuario o contraseña incorrectos")
+                return render(request, "registration/login.html", context)
+
+    return render(request, "registration/login.html", context)
+
+
+def get_logout(request):
+    tienda_db, client = DB.get_connection()
+    productos_collection = DB.get_collection("productos")
+
+    encabezado = get_categorias_encabezado(productos_collection)
+    context = {**encabezado}
+
+    logout(request)
+    messages.success(request, "Sesión cerrada correctamente")
+    return render(request, "landing_page.html", context)

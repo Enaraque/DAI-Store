@@ -31,3 +31,22 @@ class ProductoForm(forms.Form):
         if nombre and not nombre[0].isupper():
             raise forms.ValidationError("El nombre debe comenzar con mayúscula.")
         return nombre
+
+
+class LogginForm(forms.Form):
+    username = forms.CharField(
+        label="Usuario",
+        max_length=100,
+        error_messages={"required": "Inserte un nombre correcto."},
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput(),
+        label="Contraseña",
+        max_length=100,
+        error_messages={"required": "Inserte una contraseña correcta."},
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(LogginForm, self).__init__(*args, **kwargs)
+        for visible in self.visible_fields():
+            visible.field.widget.attrs["class"] = "form-control"

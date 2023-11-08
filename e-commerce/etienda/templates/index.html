@@ -33,9 +33,20 @@
                     <li class="nav-item">
                         <a class="nav-link" href="#">Orders</a>
                     </li>
+                           
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Logout</a>
+                        {% if user.is_authenticated %}
+                            <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                        {% else %}
+                            <a class="nav-link" href="{% url 'login' %}">Login</a>
+                        {% endif %}
                     </li>
+
+                    {% if user.is_authenticated %}
+                    <li class="nav-item username">
+                        <p class="nav-link"> {{ user.username }}</p>
+                    </li>
+                    {% endif %}
                 </ul>
             </div>
             <form action="{% url 'filtro' %}" method="get">
@@ -65,7 +76,7 @@
         $(document).ready(function() {
             setTimeout(function() {
                 $('.messages').show(); // Mostrar el elemento con jQuery
-            }, 500);
+            });
 
             setTimeout(function() {
                 $('.messages').remove(); // Eliminar el elemento con jQuery
