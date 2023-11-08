@@ -5,7 +5,6 @@ from typing import Any
 from datetime import datetime
 from utils import get_db_handle
 from pymongo import MongoClient
-
 sys.path.append("..")  # Adds higher directory to python modules path.
 
 

@@ -66,5 +66,4 @@ resultado = productos_collection.aggregate(
 
 for r in resultado:
     print(r)
-
     # print(f"Facturación {r['_id']}: {r['total']}")
