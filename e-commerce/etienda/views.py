@@ -10,7 +10,9 @@ from datetime import datetime as dt
 import os
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
+
 from django.shortcuts import redirect
+
 
 logger = logging.getLogger(__name__)
 
