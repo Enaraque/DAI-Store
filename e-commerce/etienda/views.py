@@ -11,6 +11,9 @@ import os
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 
+from django.shortcuts import redirect
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -120,16 +123,14 @@ def insertar_nuevo_producto(request):
                 imagen = request.FILES["imagen"]
                 name, extension = os.path.splitext(imagen.name)
                 imagen.name = (
-                    name + "-" + dt.utcnow().strftime("%Y%m%d%H%M%S") + extension
+                    "".join((name + "-" + dt.utcnow().strftime("%Y%m%d%H%M%S") + extension).split())
                 )
-                print(imagen.name)
 
                 with Image.open(imagen) as img:
                     img.save(f"static/img/{imagen.name}")
             else:
                 imagen = None
 
-            print(type(imagen))
             rating = {"rate": 0.0, "count": 1}
             datos = {
                 "title": nombre,
@@ -141,13 +142,8 @@ def insertar_nuevo_producto(request):
             }
             Producto.add_producto(productos_collection, datos)
 
-            productos_collection = DB.get_collection("productos")
-            encabezado = get_categorias_encabezado(productos_collection)
-            context = {**encabezado}
-
             messages.success(request, "Producto agregado correctamente")
-
-            return render(request, "landing_page.html", context)
+            return redirect("index")
 
         context = {**encabezado, "form": form}
 
@@ -166,13 +162,6 @@ def get_login(request):
 
 
 def validar_login(request):
-    tienda_db, client = DB.get_connection()
-    productos_collection = DB.get_collection("productos")
-
-    encabezado = get_categorias_encabezado(productos_collection)
-    form = LogginForm()
-    context = {**encabezado, "form": form}
-
     if request.method == "POST":
         form = LogginForm(request.POST)
         if form.is_valid():
@@ -181,22 +170,13 @@ def validar_login(request):
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
-                return render(request, "landing_page.html", context)
-
+                return redirect("index")
             else:
                 messages.error(request, "Usuario o contraseña incorrectos")
-                return render(request, "registration/login.html", context)
-
-    return render(request, "registration/login.html", context)
+    return redirect("login")
 
 
 def get_logout(request):
-    tienda_db, client = DB.get_connection()
-    productos_collection = DB.get_collection("productos")
-
-    encabezado = get_categorias_encabezado(productos_collection)
-    context = {**encabezado}
-
     logout(request)
     messages.success(request, "Sesión cerrada correctamente")
-    return render(request, "landing_page.html", context)
+    return redirect("index")
