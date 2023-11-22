@@ -1,10 +1,12 @@
 import sys
 from django.db import models
-from pydantic import BaseModel, FilePath, Field, EmailStr, field_validator
+from pydantic import BaseModel, FilePath, Field, EmailStr, validator
 from typing import Any
 from datetime import datetime
 from utils import get_db_handle
 from pymongo import MongoClient
+from bson import ObjectId
+
 sys.path.append("..")  # Adds higher directory to python modules path.
 
 
@@ -35,12 +37,20 @@ class Producto(BaseModel):
     rating: Nota
 
     # Validar que el nombre comience con mayúscula
-    @field_validator("title")
+    @validator("title")
     @classmethod
     def validate_nombre(cls, value):
         if not value[0].isupper():
             raise ValueError("El nombre debe comenzar con una letra mayúscula")
         return value
+
+    @staticmethod
+    def get_producto_by_id(collection, producto_id):
+        return collection.find().skip(producto_id).limit(1)
+
+    @staticmethod
+    def get_productos_by_id_range(collection, min_id, max_id):
+        return collection.find().skip(min_id).limit(min_id - (max_id+1))
 
     @staticmethod
     def get_producto(
@@ -75,9 +85,14 @@ class Producto(BaseModel):
 
     @staticmethod
     def get_facturacion(collection, identificador=None):
-        resultado = collection.aggregate(
+        return collection.aggregate(
             [
-                {"$group": {"_id": f"${identificador}", "total": {"$sum": "$price"}}},
+                {
+                    "$group": {
+                        "_id": f"${identificador}",
+                        "total": {"$sum": "$price"},
+                    }
+                },
                 {
                     "$project": {
                         "categoria": "$_id",
@@ -86,12 +101,27 @@ class Producto(BaseModel):
                 },
             ]
         )
-        return resultado
 
     @staticmethod
     def add_producto(collection, producto):
         producto = Producto(**producto)
-        collection.insert_one(producto.model_dump())
+        producto.rating = dict(producto.rating)  # type: ignore
+        producto.image = None
+        collection.insert_one(dict(producto))
+
+    @staticmethod
+    def delete_producto_by_id(collection, id: int):
+        if documento := collection.find().skip(id).limit(1):
+            id_del_documento = documento[0]["_id"]
+            obj_id = ObjectId(id_del_documento)
+            collection.delete_one({"_id": obj_id})
+
+    @staticmethod
+    def update_producto_by_id(collection, id: int, producto: dict):
+        if documento := collection.find().skip(id).limit(1):
+            id_del_documento = documento[0]["_id"]
+            obj_id = ObjectId(id_del_documento)
+            collection.update_one({"_id": obj_id}, {"$set": producto})
 
 
 class Compra(BaseModel):
