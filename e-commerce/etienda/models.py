@@ -49,6 +49,11 @@ class Producto(BaseModel):
         return collection.find().skip(producto_id).limit(1)
 
     @staticmethod
+    def get_last_producto(collection):
+        print("AAAAAAAAAAAAAAA")
+        return collection.find().sort("_id", -1).limit(1)
+
+    @staticmethod
     def get_productos_by_id_range(collection, min_id, max_id):
         return collection.find().skip(min_id).limit(min_id - (max_id+1))
 
@@ -104,10 +109,15 @@ class Producto(BaseModel):
 
     @staticmethod
     def add_producto(collection, producto):
-        producto = Producto(**producto)
-        producto.rating = dict(producto.rating)  # type: ignore
-        producto.image = None
-        collection.insert_one(dict(producto))
+        try:
+            producto = Producto(**producto)
+            producto.rating = dict(producto.rating)  # type: ignore
+            producto.image = None
+            collection.insert_one(dict(producto))
+
+            return Producto.get_last_producto(collection)
+        except Exception as e:
+            raise e
 
     @staticmethod
     def delete_producto_by_id(collection, id: int):

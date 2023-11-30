@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from ninja_extra import NinjaExtraAPI, api_controller, http_get
 from ninja import Schema
 from .models import Database_connection as DB, Producto
@@ -43,43 +43,68 @@ def convertir_producto_id(producto):
     return producto
 
 
-@api.get("/productos")
+@api.get(
+    "/productos",
+    tags=["TIENDA DAI", "GETTERS"],
+    response={202: List[ProductSchema], 404: ErrorSchema}
+)
 def get_productos_by_id_range(request, desde: int = 0, hasta: int = 4):
     productos_collection = DB.get_collection("productos")
-    productos_encontrados = Producto.get_productos_by_id_range(productos_collection, desde, hasta)
+    try:
+        productos = Producto.get_productos_by_id_range(productos_collection, desde, hasta)
+        productos_encontrados = [convertir_producto_id(producto) for producto in productos]
+        return 202, productos_encontrados
+    except Exception:
+        return 404, {"message": "productos no encontrado"}
 
-    return [convertir_producto_id(producto) for producto in productos_encontrados]
 
 # image: UploadedFile = File(...)
-@api.post("/productos")
+@api.post(
+    "/productos",
+    tags=["TIENDA DAI", "NEW"],
+    response={202: ProductSchema, 404: ErrorSchema}
+)
 def add_producto(request, payload: ProductSchemaIn):
     productos_collection = DB.get_collection("productos")
-    Producto.add_producto(productos_collection, payload.dict())
-    return {"message": "producto agregado"}
+    try:
+        producto = Producto.add_producto(productos_collection, payload.dict())
+
+        return 202, convertir_producto_id(producto[0])
+    except Exception:
+        return 404, {"message": "producto no encontrado"}
 
 
-@api.get("/productos/{producto_id}")
+@api.get(
+    "/productos/{producto_id}",
+    tags=["TIENDA DAI", "GETTERS"],
+    response={202: ProductSchema, 404: ErrorSchema}
+)
 def get_producto_by_id(request, producto_id: int):
     productos_collection = DB.get_collection("productos")
-    productos_encontrados = Producto.get_producto_by_id(
-        productos_collection, producto_id
-    )
-    return [convertir_producto_id(producto) for producto in productos_encontrados]
+    try:
+        producto = Producto.get_producto_by_id(productos_collection, producto_id)
+        return 202, convertir_producto_id(producto[0])
+    except Exception:
+        return 404, {"message": "producto no encontrado"}
 
 
-@api.delete("/productos/{producto_id}")
+@api.delete(
+    "/productos/{producto_id}",
+    tags=["TIENDA DAI", "DELETE"],
+    response={200: dict, 404: ErrorSchema}
+)
 def delete_producto_by_id(request, producto_id: int):
     productos_collection = DB.get_collection("productos")
     try:
         Producto.delete_producto_by_id(productos_collection, producto_id)
-        return {"message": "producto eliminado"}
+        return 200, {"message": "producto eliminado"}
     except Exception:
         return {"message": "producto no encontrado"}
 
 
 @api.put(
     "/productos/{producto_id}",
-    tags=["TIENDA DAI"],
+    tags=["TIENDA DAI", "MODIFY"],
     response={202: ProductSchema, 404: ErrorSchema}
 )
 def modifica_producto(request, producto_id: int, payload: ProductSchemaIn):
@@ -95,8 +120,3 @@ def modifica_producto(request, producto_id: int, payload: ProductSchemaIn):
         return 202, convertir_producto_id(producto[0])
     except Exception:
         return 404, {"message": "producto no encontrado"}
-
-
-# TODO:
-# añadir mensajes de error
-# producto puede ser modificado solo con los campos deseados, Para no modificar añadir None
