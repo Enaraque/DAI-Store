@@ -123,6 +123,8 @@ class Producto(BaseModel):
             obj_id = ObjectId(id_del_documento)
             collection.update_one({"_id": obj_id}, {"$set": producto})
 
+            return Producto.get_producto_by_id(collection, id)
+
 
 class Compra(BaseModel):
     _id: Any

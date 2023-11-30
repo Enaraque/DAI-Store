@@ -1,8 +1,10 @@
+from typing import Optional
 from ninja_extra import NinjaExtraAPI, api_controller, http_get
 from ninja import Schema
 from .models import Database_connection as DB, Producto
 from bson import ObjectId
 import logging
+# from ninja.files import UploadedFile, File
 
 logger = logging.getLogger(__name__)
 api = NinjaExtraAPI()
@@ -19,16 +21,16 @@ class ProductSchema(Schema):  # sirve para validar y para documentación
     price: float
     description: str
     category: str
-    image: str = None
+    image: str | None
     rating: Rate
 
 
 class ProductSchemaIn(Schema):
-    title: str
-    price: float
-    description: str
-    category: str
-    rating: Rate
+    title: Optional[str]
+    price: Optional[float]
+    description: Optional[str]
+    category: Optional[str]
+    rating: Optional[Rate]
 
 
 class ErrorSchema(Schema):
@@ -48,7 +50,7 @@ def get_productos_by_id_range(request, desde: int = 0, hasta: int = 4):
 
     return [convertir_producto_id(producto) for producto in productos_encontrados]
 
-
+# image: UploadedFile = File(...)
 @api.post("/productos")
 def add_producto(request, payload: ProductSchemaIn):
     productos_collection = DB.get_collection("productos")
@@ -78,11 +80,23 @@ def delete_producto_by_id(request, producto_id: int):
 @api.put(
     "/productos/{producto_id}",
     tags=["TIENDA DAI"],
+    response={202: ProductSchema, 404: ErrorSchema}
 )
 def modifica_producto(request, producto_id: int, payload: ProductSchemaIn):
     productos_collection = DB.get_collection("productos")
     try:
-        Producto.update_producto_by_id(productos_collection, producto_id, payload.dict())
-        return {"message": "producto actualizado"}
+        payload_dict = {}
+
+        for attr, value in payload.dict().items():
+            if value is not None:
+                payload_dict |= {attr: value}
+        producto = Producto.update_producto_by_id(productos_collection, producto_id, payload_dict)
+
+        return 202, convertir_producto_id(producto[0])
     except Exception:
-        return {"message": "producto no encontrado"}
+        return 404, {"message": "producto no encontrado"}
+
+
+# TODO:
+# añadir mensajes de error
+# producto puede ser modificado solo con los campos deseados, Para no modificar añadir None
