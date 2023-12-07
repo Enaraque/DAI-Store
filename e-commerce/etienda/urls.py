@@ -1,5 +1,6 @@
 from django.urls import path, include
 from . import views
+from .api import api
 
 urlpatterns = [
     path("", views.index, name="index"),
@@ -14,4 +15,5 @@ urlpatterns = [
     path("login", views.get_login, name="login"),
     path("login/validar_login", views.validar_login, name="validar_login"),
     path("logout", views.get_logout, name="logout"),
+    path("api/", api.urls),
 ]

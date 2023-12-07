@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "etienda",
+    "ninja_extra",
 ]
 
 MIDDLEWARE = [

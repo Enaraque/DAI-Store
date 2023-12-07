@@ -8,6 +8,7 @@ import logging
 from PIL import Image
 from datetime import datetime as dt
 import os
+from datetime import timezone
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 
@@ -34,7 +35,7 @@ def get_consultas(colection):
     consulta4 = Producto.get_producto(colection, "men's clothing", orden="rating.rate")
     consulta5 = Producto.get_facturacion(colection)
     consulta6 = Producto.get_facturacion(colection, "category")
-    context = {
+    return {
         "consulta1": consulta1,
         "consulta2": consulta2,
         "consulta3": consulta3,
@@ -42,7 +43,6 @@ def get_consultas(colection):
         "consulta5": consulta5,
         "consulta6": consulta6,
     }
-    return context
 
 
 def get_categorias_encabezado(coleccion):
@@ -57,9 +57,7 @@ def get_categorias_encabezado(coleccion):
         }
         categorias.append(categoria_con_imagen)
 
-    context = {"categorias": categorias}
-
-    return context
+    return {"categorias": categorias}
 
 
 def get_imagen_categoria(coleccion, categorias):
@@ -122,8 +120,13 @@ def insertar_nuevo_producto(request):
             if "imagen" in request.FILES:
                 imagen = request.FILES["imagen"]
                 name, extension = os.path.splitext(imagen.name)
-                imagen.name = (
-                    "".join((name + "-" + dt.utcnow().strftime("%Y%m%d%H%M%S") + extension).split())
+                imagen.name = "".join(
+                    (
+                        name
+                        + "-"
+                        + dt.now(timezone.utc).strftime("%Y%m%d%H%M%S")
+                        + extension
+                    ).split()
                 )
 
                 with Image.open(imagen) as img:
