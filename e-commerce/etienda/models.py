@@ -6,8 +6,14 @@ from datetime import datetime
 from utils import get_db_handle
 from pymongo import MongoClient
 from bson import ObjectId
+from datetime import datetime as dt
+from datetime import timezone
+from PIL import Image
+import os
+import logging
 
 sys.path.append("..")  # Adds higher directory to python modules path.
+logger = logging.getLogger(__name__)
 
 
 class Database_connection:
@@ -45,12 +51,11 @@ class Producto(BaseModel):
         return value
 
     @staticmethod
-    def get_producto_by_id(collection, producto_id):
-        return collection.find().skip(producto_id).limit(1)
+    def get_producto_by_id(collection, producto_id: str):
+        return collection.find_one({"_id": ObjectId(producto_id)})
 
     @staticmethod
     def get_last_producto(collection):
-        print("AAAAAAAAAAAAAAA")
         return collection.find().sort("_id", -1).limit(1)
 
     @staticmethod
@@ -108,30 +113,41 @@ class Producto(BaseModel):
         )
 
     @staticmethod
-    def add_producto(collection, producto):
+    def add_producto(collection, producto, imagen=None):
         try:
             producto = Producto(**producto)
             producto.rating = dict(producto.rating)  # type: ignore
-            producto.image = None
-            collection.insert_one(dict(producto))
+            if imagen is not None:
+                name, extension = os.path.splitext(imagen.name)
+                imagen.name = "".join(
+                    (
+                        name
+                        + "-"
+                        + dt.now(timezone.utc).strftime("%Y%m%d%H%M%S")
+                        + extension
+                    ).split()
+                )
+                path = 'static/img/' + imagen.name
+                with open(path, "wb+") as destination:
+                    for chunk in imagen.chunks():
+                        destination.write(chunk)
+                producto.image = str(imagen)
+            else:
+                producto.image = None
 
+            collection.insert_one(dict(producto))
             return Producto.get_last_producto(collection)
         except Exception as e:
             raise e
 
     @staticmethod
-    def delete_producto_by_id(collection, id: int):
-        if documento := collection.find().skip(id).limit(1):
-            id_del_documento = documento[0]["_id"]
-            obj_id = ObjectId(id_del_documento)
-            collection.delete_one({"_id": obj_id})
+    def delete_producto_by_id(collection, producto_id: str):
+        return collection.delete_one({"_id": ObjectId(producto_id)})
 
     @staticmethod
-    def update_producto_by_id(collection, id: int, producto: dict):
-        if documento := collection.find().skip(id).limit(1):
-            id_del_documento = documento[0]["_id"]
-            obj_id = ObjectId(id_del_documento)
-            collection.update_one({"_id": obj_id}, {"$set": producto})
+    def update_producto_by_id(collection, id: str, producto: dict):
+        if documento := Producto.get_producto_by_id(collection, id):
+            collection.update_one({"_id": documento["_id"]}, {"$set": producto})
 
             return Producto.get_producto_by_id(collection, id)
 

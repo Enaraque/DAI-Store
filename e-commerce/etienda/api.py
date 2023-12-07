@@ -1,10 +1,10 @@
 from typing import Optional, List
 from ninja_extra import NinjaExtraAPI, api_controller, http_get
-from ninja import Schema
+from ninja import Schema, File
 from .models import Database_connection as DB, Producto
 from bson import ObjectId
 import logging
-# from ninja.files import UploadedFile, File
+from ninja.files import UploadedFile
 
 logger = logging.getLogger(__name__)
 api = NinjaExtraAPI()
@@ -58,16 +58,15 @@ def get_productos_by_id_range(request, desde: int = 0, hasta: int = 4):
         return 404, {"message": "productos no encontrado"}
 
 
-# image: UploadedFile = File(...)
 @api.post(
     "/productos",
     tags=["TIENDA DAI", "NEW"],
     response={202: ProductSchema, 404: ErrorSchema}
 )
-def add_producto(request, payload: ProductSchemaIn):
+def add_producto(request, payload: ProductSchemaIn, imagen: UploadedFile = None):
     productos_collection = DB.get_collection("productos")
     try:
-        producto = Producto.add_producto(productos_collection, payload.dict())
+        producto = Producto.add_producto(productos_collection, payload.dict(), imagen)
 
         return 202, convertir_producto_id(producto[0])
     except Exception:
@@ -79,11 +78,11 @@ def add_producto(request, payload: ProductSchemaIn):
     tags=["TIENDA DAI", "GETTERS"],
     response={202: ProductSchema, 404: ErrorSchema}
 )
-def get_producto_by_id(request, producto_id: int):
+def get_producto_by_id(request, producto_id: str):
     productos_collection = DB.get_collection("productos")
     try:
         producto = Producto.get_producto_by_id(productos_collection, producto_id)
-        return 202, convertir_producto_id(producto[0])
+        return 202, convertir_producto_id(producto)
     except Exception:
         return 404, {"message": "producto no encontrado"}
 
@@ -93,7 +92,7 @@ def get_producto_by_id(request, producto_id: int):
     tags=["TIENDA DAI", "DELETE"],
     response={200: dict, 404: ErrorSchema}
 )
-def delete_producto_by_id(request, producto_id: int):
+def delete_producto_by_id(request, producto_id: str):
     productos_collection = DB.get_collection("productos")
     try:
         Producto.delete_producto_by_id(productos_collection, producto_id)
@@ -107,7 +106,7 @@ def delete_producto_by_id(request, producto_id: int):
     tags=["TIENDA DAI", "MODIFY"],
     response={202: ProductSchema, 404: ErrorSchema}
 )
-def modifica_producto(request, producto_id: int, payload: ProductSchemaIn):
+def modifica_producto(request, producto_id: str, payload: ProductSchemaIn):
     productos_collection = DB.get_collection("productos")
     try:
         payload_dict = {}
@@ -117,6 +116,6 @@ def modifica_producto(request, producto_id: int, payload: ProductSchemaIn):
                 payload_dict |= {attr: value}
         producto = Producto.update_producto_by_id(productos_collection, producto_id, payload_dict)
 
-        return 202, convertir_producto_id(producto[0])
+        return 202, convertir_producto_id(producto)
     except Exception:
         return 404, {"message": "producto no encontrado"}
