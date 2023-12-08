@@ -43,6 +43,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 drawStars(container, star.getAttribute('data-card-id'));
             });
 
+            star.addEventListener('mousedown', function() {
+                changeColorStars(container, star.getAttribute('data-index'));
+            });
+
             star.addEventListener('click', (event) => {
 				const puntuacion = parseInt(event.target.dataset.index) + 1;
 
@@ -53,8 +57,6 @@ document.addEventListener('DOMContentLoaded', function () {
 				fetch(`http://0.0.0.0:8000/etienda/api/productos/${element_id}/${puntuacion}`, { method: 'PUT' })
 				 	.then(response => response.json())
 				 	.then(() => {
-                        changeColorStars(container, star.getAttribute('data-index'));
-                        changeColorStars(container)
 				 		drawStars(container, element_id);
 				 	})
 				 	.catch(error => {
@@ -118,7 +120,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function changeColorStars(container, index) {
         const stars = container.querySelectorAll('.rating__star');
         for (let i = 0; i <= index; i++) {
-            stars[i].classList.add('fa-star-o', 'fa-star-half-o', 'star_pressed_color');
+            stars[i].classList.add('star_pressed_color');
         }
     }
 });
