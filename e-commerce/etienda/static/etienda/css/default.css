@@ -118,3 +118,27 @@ form > div > button.btn:focus {
 .username > p:hover {
     color: #fff;
 }
+
+.rating {
+    width: 180px;
+}
+ 
+ .rating__star {
+    cursor: pointer;
+    color: #dabd18b2;
+}
+
+.rating {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.rating > span {
+    color: rgb(182, 195, 191);
+}
+
+.star_pressed_color {
+    color: #da5518;
+}

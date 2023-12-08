@@ -147,6 +147,12 @@ class Producto(BaseModel):
     @staticmethod
     def update_producto_by_id(collection, id: str, producto: dict):
         if documento := Producto.get_producto_by_id(collection, id):
+            print(producto)
+            if "rating" in producto and "rate" in producto["rating"]:
+                nuevo_rate = ((documento["rating"]["rate"] * documento["rating"]["count"]) + producto["rating"]["rate"]) / (documento["rating"]["count"] + 1)
+                producto["rating"]["rate"] = nuevo_rate
+                producto["rating"]["count"] = documento["rating"]["count"] + 1
+
             collection.update_one({"_id": documento["_id"]}, {"$set": producto})
 
             return Producto.get_producto_by_id(collection, id)
