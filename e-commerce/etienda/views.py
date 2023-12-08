@@ -70,13 +70,20 @@ def get_imagen_categoria(coleccion, categorias):
     return imagenes
 
 
+def convertir_producto_id(producto):
+    producto["id"] = str(producto["_id"])
+    del producto["_id"]
+    return producto
+
+
 def get_categoria(request, categoria):
     tienda_db, client = DB.get_connection()
     productos_collection = DB.get_collection("productos")
 
     productos = Producto.get_producto(productos_collection, categoria)
+    productos_encontrados = [convertir_producto_id(producto) for producto in productos]
     encabezado = get_categorias_encabezado(productos_collection)
-    context = {"productos": productos, **encabezado}
+    context = {"productos": productos_encontrados, **encabezado}
 
     return render(request, "categorias.html", context)
 
@@ -87,8 +94,9 @@ def filtrar_busqueda(request):
     filtrado = request.GET.get("search")
 
     productos = Producto.get_product_type(productos_collection, filtrado)
+    productos_encontrados = [convertir_producto_id(producto) for producto in productos]
     encabezado = get_categorias_encabezado(productos_collection)
-    context = {"productos": productos, **encabezado}
+    context = {"productos": productos_encontrados, **encabezado}
 
     return render(request, "categorias.html", context)
 

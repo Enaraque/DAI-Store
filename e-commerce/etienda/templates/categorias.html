@@ -11,8 +11,16 @@
             <h5 class="card-title">{{ p.title }}</h5>
             <p class="card-text">{{ p.description }}</p>
             <p class="price">{{ p.price }}</p>
+            {% if user.is_authenticated %}
+            <div class="rating">
+                <div class="star_rating" data-id={{p.id}}>
+                </div>
+                <span class="rating_count">
+                </span>
+            </div>
+            {% endif %}
         </div>
-      </div>
+    </div>
 
 {% endfor %}  
 </div>

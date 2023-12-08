@@ -12,7 +12,7 @@ api = NinjaExtraAPI()
 
 class Rate(Schema):
     rate: float
-    count: int
+    count: Optional[int]
 
 
 class ProductSchema(Schema):  # sirve para validar y para documentación
@@ -117,5 +117,21 @@ def modifica_producto(request, producto_id: str, payload: ProductSchemaIn):
         producto = Producto.update_producto_by_id(productos_collection, producto_id, payload_dict)
 
         return 202, convertir_producto_id(producto)
+    except Exception:
+        return 404, {"message": "producto no encontrado"}
+
+
+@api.put(
+    "/productos/{producto_id}/{rate}", tags=["TIENDA DAI", "MODIFY"],
+    response={202: ProductSchema, 404: ErrorSchema}
+)
+def update_rating(request, producto_id: str, rate: float):
+    productos_collection = DB.get_collection("productos")
+    try:
+        payload_dict = {"rating": {"rate": rate}}
+        print("GERGERGERGERGERGERGERGERG\n\n\n\n\n")
+        producto = Producto.update_producto_by_id(productos_collection, producto_id, payload_dict)
+        return 202, convertir_producto_id(producto)
+
     except Exception:
         return 404, {"message": "producto no encontrado"}
