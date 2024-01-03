@@ -6,3 +6,4 @@ rich==10.12
 django==4.2
 image==1.5
 django-ninja-extra==0.19.8
+django-cors-headers==4.3.1
