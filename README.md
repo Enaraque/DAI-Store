@@ -58,7 +58,7 @@ Para ejecutar la aplicacion en un entorno de producción, hemos hecho uso de `gu
 Este entorno de producción lo levantamos con el archivo `docker-compose-prod.yml`. Para ello, ejecutaremos el siguiente comando:
 
 ```bash
-docker compose -f docker-compose.prod.yml up
+docker compose -f docker-compose-prod.yml up
 ```
 
 Con esto ejecutaríamos la aplicación principal en el puerto 8088 con el que accederíamos al servidor de `nginx`. Donde para acceder a ella, tendremos que ir a la dirección `http://localhost:8088/etienda`.
