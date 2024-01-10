@@ -6,6 +6,3 @@ COPY . /e-commerce
 RUN pip install -r requirements.txt
 
 RUN apk add --no-cache mongodb-tools
-
-COPY ./entrypoint.sh /
-ENTRYPOINT ["sh", "/entrypoint.sh"]
