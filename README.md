@@ -55,7 +55,7 @@ Una vez ejecutado, podremos acceder a la aplicación en la dirección `http://lo
 ### Despliegue
 
 Para ejecutar la aplicacion en un entorno de producción, hemos hecho uso de `gunicorn` y `nginx`.
-Este entorno de producción lo levantamos con el archivo `docker-compose.prod.yml`. Para ello, ejecutaremos el siguiente comando:
+Este entorno de producción lo levantamos con el archivo `docker-compose-prod.yml`. Para ello, ejecutaremos el siguiente comando:
 
 ```bash
 docker compose -f docker-compose.prod.yml up
