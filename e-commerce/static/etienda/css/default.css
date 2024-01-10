@@ -1,0 +1,144 @@
+.navbar {
+    padding-left: 30px;
+    padding-right: 30px;
+    background-color: #3A8D82;
+}
+
+.navbar-brand, .btn, .nav-link {
+    color: #fff;
+}
+
+form > div > button.btn {
+    background-color: #58D68D;
+}
+
+form > div > button.btn:hover {
+    background-color: #58D68D;
+}
+
+form > div > button.btn:focus {
+    background-color: #71ca96;
+}
+
+.my-gallery {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.my-card {
+    margin-top: 30px;
+    margin-bottom: 30px;
+    margin-left: 15px;
+    max-width: 20rem;
+    padding: 1rem;
+    border-color: rgb(146, 139, 139);
+    max-height: 40rem;
+}
+
+.my-card > img {
+    max-height: 10rem;
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    min-height: 160px;
+}
+
+.my-card-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;    
+}
+
+.my-card-body > .card-text {
+    max-height: 130px;
+    overflow: scroll;
+}
+
+.my-card-body > .price {
+    font-size: 1.5rem;
+    font-weight: bold;
+    justify-content: end;
+    margin-top: auto;
+    margin-bottom: 0px;
+    margin-left: auto;
+}
+
+.my-card-body > .card-title {
+    min-height: 72px;
+}
+
+.add-elemento {
+    margin-top: 30px;
+    margin-bottom: 30px;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 20rem;
+    padding: 1rem;
+    max-height: 40rem;
+    background-color: azure;
+}
+
+.add-elemento > button {
+    margin-top: 5px;
+    margin-left: 7rem;
+    border-color: #fff ;
+    background-color: #58D68D;
+}
+
+.add-elemento > button:hover {
+    background-color: #58D68D;
+}
+
+.messages {
+    margin: 5px;
+    padding: 0;
+    list-style-type: none;
+    text-align: center;
+    font-weight: bold;
+}
+
+.form-errors {
+    color: red;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.username {
+    /* border: #58D68D 3px solid; */
+    background-color: #127667;
+    border-radius: 10%;
+    text-align: center;
+    margin-left: 20px;
+}
+
+.username > p {
+    margin: 0;
+}
+
+.username > p:hover {
+    color: #fff;
+}
+
+.rating {
+    width: 180px;
+}
+ 
+ .rating__star {
+    cursor: pointer;
+    color: #dabd18b2;
+}
+
+.rating {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.rating > span {
+    color: rgb(182, 195, 191);
+}
+
+.star_pressed_color {
+    color: #da5518;
+}
