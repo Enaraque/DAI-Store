@@ -1,4 +1,4 @@
-# Proyecto DAI
+# DAI Store
 
 En este repositorio se encuentra el código fuente del proyecto de la asignatura Desarrollo de Aplicaciones para Internet.
 
